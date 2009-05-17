@@ -1,0 +1,26 @@
+pukiwiki:
+  date:
+  uri_host:
+  uri_base:
+  pagename_prefix:
+  charset:
+  filename_suffix:
+  debug:
+setext:
+  filename_suffix:
+copy:
+  path:
+mail:
+  pop: 
+  smtp:
+  auth:
+    user:
+    pass:
+  from:
+  to:
+    - addr
+    - addr
+    - addr
+  encoding:
+  subject:
+  body: |-

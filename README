@@ -1,0 +1,148 @@
+これはなに？
+============
+
+PukiWiki を使ったお仕事を少しだけ楽にするツールです。完全に自動化はでき
+ないけど、そこそこ定型の仕事をお手伝いします。
+
+何ができるの？
+==============
+
+ 1. PukiWiki の calendar2 形式で指定日（デフォルトは今日）のページを作成
+ 2. 指定日のページの source をそのまま取得（同梱の raw プラグインを利用）
+ 3. 指定日のページの source をなんとなく setext っぽく変換
+ 4. 変換した setext ファイルを所定の場所にコピー
+ 5. 指定日のページに関する情報をメールで送る
+
+何があれば使えるの？
+====================
+
+ * Ruby
+ * Rake
+ * WWW::Mechanize
+ * Hpricot
+ * ちょっとした YAML の知識
+
+どうやって使うの？
+==================
+
+ruby と必要な gem をインストール
+--------------------------------
+
+$ gem install rake
+$ gem install mechanize
+$ gem install hpricot
+
+現在の Mechanize 0.9 以降のデフォルトパーサは Nokogiri なんですが、
+UTF-8 じゃないページを扱おうとすると苦労が多そうなのであえて Hpricot を
+使っています。
+
+とりあえず動くかどうか確認
+--------------------------
+
+$ rake
+
+rake clean  # cleanup each namespace's backup and debugging pages
+
+と表示されればたぶん（クライアントサイドは）正常に動いています。
+
+raw.inc.php をセット
+--------------------
+
+PukiWiki の plugin/ ディレクトリに、同梱の lib/raw.inc.php を置いてくだ
+さい。このツールはこの raw プラグインに依存しています。
+
+YAMLファイルを用意
+------------------
+
+recipes/ ディレクトリの中に YAML で設定ファイルを置いてください。例えば
+practice.yaml です。とりあえず中身は空でよいです。そしてまた rake を呼
+びます。すると以下のように怒られます。
+
+rake aborted!
+PukiAssist::PukiWiki::ConfigForPukiwikiNotExist
+
+今度は practice.yaml の中身を以下のようにしてください。
+
+pukiwiki:
+  uri_host: 'http://pukiwiki.example.com'
+  uri_base: '/PATH/TO/PUKIWIKI/'
+  paganame_prefix: 'Log/'
+
+三度目の rake. 今度は以下のように表示されるはずです。
+
+rake clean                 # cleanup each namespace's backup and debugging ...
+rake practice:clean        # cleanup backup files and mechanize debugging p...
+rake practice:create_page  # create new page on
+rake practice:fetch        # fetch PukiWiki raw data to 20090517-raw.txt
+rake practice:setextize    # covert PukiWiki to setext on 20090517-setext.txt
+
+ご覧のように作った YAML ファイルの分だけ namespace ができ、その中にいく
+つか task が現れます。
+
+どのような設定項目があるかは recipes/format.yaml を読んでください。
+
+YAML ファイルは UTF-8 で書いてください。
+
+捕捉
+====
+
+work/ ディレクトリ
+------------------
+
+PukiWiki から取得した raw データ、これを setext 化したファイルは work/
+ディレクトリ以下に、recipe 内に置いた YAML ファイルの名前のディレクトリ
+を掘って保存されます。
+
+上の例で言うと work/practice/ 以下に保存されます。
+
+page/ ディレクトリ
+------------------
+
+このディレクトリには Mechanize 関係の情報が保存されます。通常は使いませ
+ん。
+
+ pukiwiki:
+   debug: true
+
+と設定すると Mechanize の取得した HTML、それをパースした結果が保存され
+ます。
+
+コツ
+====
+
+uri_base
+--------
+
+uri_base は / だけでも必要です。そのため uri_host は / を付けずに記述し
+ます。この uri_base は PukiWiki の編集画面の textarea を Mechanize で探
+すために使っています。
+
+erb の使えるところ
+------------------
+
+以下の部分で erb が使えます。
+
+mail:
+  subject:
+  body:
+copy:
+  path:
+
+使いどころ
+==========
+
+ * PukiWiki を使ってドキュメントを書いているが、訳あってメールを使って
+   その情報を共有したい
+   -> setext 形式に変換できるので Wiki に書いた内容をほぼそのままメール
+      で送ってもあまり違和感がありません。
+ * PukiWiki 上に定期的に情報を集約したいので calendar2 形式のページをサ
+   クッと作成してその URL をメールで配信したい
+
+また bin/pukiwiki2setext.rb は単体でも使えるので、わざわざ YAML を書い
+たり raw プラグインを使ったりしなくても setext 形式のデータを得ることは
+できます。
+
+ライセンス
+==========
+
+Two-clause BSD
