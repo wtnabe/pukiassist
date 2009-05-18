@@ -14,7 +14,7 @@ module PukiAssist
 
     def put
       if ( setext_path_available? )
-        FileUtils.cp( setext_path, @conf['path'] )
+        FileUtils.cp( setext_path, path )
       end
     end
 
