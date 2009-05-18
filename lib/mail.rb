@@ -8,7 +8,8 @@ require 'iconv'
 
 module PukiAssist
   class Mail
-    def initialize( opt = {} )
+    def initialize( name, opt = {} )
+      @name = name
       @conf = {
         'pop'      => nil,
         'smtp'     => nil,
@@ -26,6 +27,7 @@ module PukiAssist
       @conf['encoding'] = @conf['encoding'].upcase
       @nkf_out          = nkf_out
     end
+    attr_reader :name
 
     def default_send_port
       # non-auth smtp
@@ -57,7 +59,16 @@ module PukiAssist
     end
 
     def body
-      return Iconv.conv( @conf['encoding'], 'UTF-8', erbed( @conf['body'] ) )
+      body = ''
+
+      case ( @conf['body'].class.to_s )
+      when 'String'
+        body = erbed( @conf['body'] )
+      when 'Symbol'
+        body = erbed( open( File.join( PATH[:recipe], "#{@name}.erb" ) ).read )
+      end
+
+      return Iconv.conv( @conf['encoding'], 'UTF-8', body )
     end
 
     def subject

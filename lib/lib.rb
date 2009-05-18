@@ -54,7 +54,7 @@ module PukiAssist
 
   def self.mail( recipe )
     if ( !@mail or @recipe != recipe )
-      @mail = Mail.new( conf( recipe )['mail'] )
+      @mail = Mail.new( recipe, conf( recipe )['mail'] )
     end
 
     return @mail
