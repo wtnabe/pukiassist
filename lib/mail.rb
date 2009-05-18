@@ -46,6 +46,8 @@ module PukiAssist
                              nil,
                              @conf['auth']['user'],
                              @conf['auth']['pass'] )
+        @conf['auth']['user'] = nil
+        @conf['auth']['pass'] = nil
       end
       Net::SMTP.start( @conf['smtp'], @conf['port'],
                        'localhost.localdomain',
