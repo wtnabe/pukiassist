@@ -1,6 +1,8 @@
 #! /usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
+require 'kconv'
+
 =begin
 
 もっとも基本的な PukiWiki の文法を解釈して setext っぽく変換する。
@@ -117,10 +119,10 @@ class PukiWiki2Setext
 end
 
 if ( __FILE__ == $0 )
-  text = []
+  text = ''
   ARGV.each { |f|
     if ( File.exist?( f ) )
-      text = open( f ).read
+      text += open( f ).read
     end
   }
   puts PukiWiki2Setext.new.convert( text ).join( "\n" )
