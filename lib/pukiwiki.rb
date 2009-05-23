@@ -97,12 +97,7 @@ module PukiAssist
     end
 
     def pagename
-      kcode    = $KCODE
-      $KCODE   = @conf['charset']
-      pagename = URI.encode( (@conf['pagename_prefix'] + @date).send( "to#{@conf['charset']}" ) )
-      $KCODE   = kcode
-
-      return pagename 
+      return URI.encode( (@conf['pagename_prefix'] + @date).send( "to#{@conf['charset']}" ) )
     end
 
     #
