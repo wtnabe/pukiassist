@@ -167,7 +167,7 @@ module PukiAssist
 
     def clean
       Dir.chdir( work_dir ) {
-        Dir.glob( ['*~', '*.bak'] ).each { |e|
+        Dir.glob( '*~\0*.bak' ).each { |e|
           File.unlink( e )
         }
       }
