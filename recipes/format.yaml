@@ -24,3 +24,23 @@ mail:
   encoding:
   subject:
   body: |-
+---
+pukiwiki:
+  date: 2009-05-23
+  uri_host: http://example.com/
+  pagename_prefix: Log/
+mail:
+  subject: test mail
+  body: <%= PukiAssist.pukiwiki( recipe ).uri_for_readd %>
+---
+pukiwiki:
+  date: ''
+  uri_host: http://example.com/
+  uri_base: /wiki/
+  pagename_prefix: 日本語
+  filename_suffix: '自由自在.txt'
+setext:
+  filename_suffix: '自由自在.etx'
+mail:
+  subject: test mail
+  body: <%= open( PukiAssist.setext( recipe ).path ).read %>

@@ -113,9 +113,49 @@ page/ ディレクトリ
 uri_base
 --------
 
-uri_base は / だけでも必要です。そのため uri_host は / を付けずに記述し
-ます。この uri_base は PukiWiki の編集画面の textarea を Mechanize で探
-すために使っています。
+uri_base は PukiWiki の編集画面の textarea を Mechanize で探すために使っ
+ています。基本的には PukiWiki を設置したパスを記述します。いちばん上の
+階層に設置している場合は省略してもよいかもしれません。（もしかしたら
+SCRIPT_NAME が要るかもしれません。）
+
+pagename_prefix と date
+-----------------------
+
+基本的にこのツールは動作した日付か date: で明示した日付をページ名やファ
+イル名に付加します。これは定期的に PukiWiki に関する操作が必要になると
+いう状況を想定した設計となっています。
+
+例えば
+
+pukiwiki:
+  date: 2009-05-23
+  pagename_prefix: Log
+
+の場合は Log2009-05-23 というページを、
+
+pukiwiki:
+  date: 2009-05-23
+  pagename_prefix: Log/
+
+の場合は Log/2009-05-23 というページを扱います。
+
+しかしまったく日付と関係のないページを扱うこともできます。その場合は
+
+pukiwiki:
+  date: ''   # ( or null )
+  pagename_prefix: 完全なページ名
+
+と、明示的に date: を空文字か null（nil は文字列 "nil" になってしまう）
+にしてあげると、日付の関係ないページを扱うことができます。この場合
+setext 用の設定も
+
+setext:
+  filename_suffix: 完全なファイル名
+
+と、補完されない日付の分も含めて完全なファイル名を指定してください。
+
+それぞれどういうページ名やファイル名を扱おうとしているかは rake -T で確
+認できます。
 
 erb の使えるところ
 ------------------
