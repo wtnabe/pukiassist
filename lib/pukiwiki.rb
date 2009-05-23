@@ -25,7 +25,7 @@ module PukiAssist
       @conf = {
         'date'            => Date.today,
         'uri_host'        => nil,
-        'uri_base'        => nil,
+        'uri_base'        => '/',
         'pagename_prefix' => nil,
         'charset'         => 'euc',
         'filename_suffix' => '-raw.txt',
@@ -39,7 +39,7 @@ module PukiAssist
 
       @date = @conf['date'].to_s
       if ( @conf['uri_host'] and @conf['uri_base'] )
-        @uri = URI( @conf['uri_host'] + @conf['uri_base'] )
+        @uri = URI( @conf['uri_host'] ) + @conf['uri_base']
       else
         raise URINotEnough
       end
