@@ -40,6 +40,7 @@ module PukiAssist
       @date = @conf['date'].to_s
       if ( @conf['uri_host'] and @conf['uri_base'] )
         @uri = URI( @conf['uri_host'] ) + @conf['uri_base']
+        @uri_base = @uri.dup.to_s
       else
         raise URINotEnough
       end
@@ -64,7 +65,9 @@ module PukiAssist
       agent = EzDebug_Mechanize.new( :debug    => @conf['debug'],
                                      :page_dir => debug_dir )
       page = agent.get( create_uri( 'edit' ) )
-      form = page.form_with( :action => @conf['uri_base'] )
+      if ( !form = page.form_with( :action => @conf['uri_base'] ) )
+        form = page.form_with( :action => @uri_base )
+      end
 
       msg = form.field_with( :name => 'msg' )
       msg.value = 'created by pukiassist' if msg.value == ''
