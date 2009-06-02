@@ -15,7 +15,8 @@ module PukiAssist
         'smtp'     => nil,
         'auth'     => {
           'user' => nil,
-          'pass' => nil
+          'pass' => nil,
+          'type' => nil,
         },
         'from'     => nil,
         'to'       => [],
@@ -44,16 +45,22 @@ module PukiAssist
 
     def sendmail
       if ( pop_before_smtp? )
-        Net::POP3.auth_only( @conf['pop'],
-                             nil,
-                             @conf['auth']['user'],
-                             @conf['auth']['pass'] )
+        apop = ( @conf['auth']['type'] == 'apop' )
+        p apop
+        Net::POP3.APOP( apop ).auth_only( @conf['pop'],
+                                          nil,
+                                          @conf['auth']['user'],
+                                          @conf['auth']['pass'] )
         @conf['auth']['user'] = nil
         @conf['auth']['pass'] = nil
+        @conf['auth']['type'] = nil
+        sleep 1
       end
+      authtype = @conf['auth']['type'].is_a?( Symbol ) ? @conf['auth']['type'] : nil
       Net::SMTP.start( @conf['smtp'], @conf['port'],
                        'localhost.localdomain',
-                       @conf['auth']['user'], @conf['auth']['pass'] ) { |s|
+                       @conf['auth']['user'], @conf['auth']['pass'],
+                       authtype ) { |s|
         s.sendmail( header + body, @conf['from'], @conf['to'] )
       }
     end

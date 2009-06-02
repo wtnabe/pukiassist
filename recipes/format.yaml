@@ -16,6 +16,7 @@ mail:
   auth:
     user:
     pass:
+    type:
   from:
   to:
     - addr
