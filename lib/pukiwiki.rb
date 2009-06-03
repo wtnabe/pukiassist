@@ -64,15 +64,22 @@ module PukiAssist
     def create_page
       agent = EzDebug_Mechanize.new( :debug    => @conf['debug'],
                                      :page_dir => debug_dir )
-      page = agent.get( create_uri( 'edit' ) )
-      if ( !form = page.form_with( :action => @conf['uri_base'] ) )
-        form = page.form_with( :action => @uri_base )
-      end
-
-      msg = form.field_with( :name => 'msg' )
+      form = find_msg_form( agent.get( create_uri( 'edit' ) ) )
+      msg  = form.field_with( :name => 'msg' )
       msg.value = 'created by pukiassist' if msg.value == ''
 
       form.submit( form.button_with( :value => 'ページの更新'.send( "to#{@conf['charset']}" ) ) )
+    end
+
+    def find_msg_form( page )
+      forms = page.forms_with( :action => @conf['uri_base'] )
+      if ( forms.size == 0 )
+        forms = page.forms_with( :action => @uri_base )
+      end
+
+      return forms.find { |f|
+        f.has_field?( 'msg' )
+      }
     end
 
     def create_uri( cmd = 'raw' )
