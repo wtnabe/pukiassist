@@ -22,6 +22,8 @@ mail:
     - addr
     - addr
     - addr
+  cc:
+  bcc:
   encoding:
   subject:
   body: |-

@@ -20,15 +20,28 @@ module PukiAssist
         },
         'from'     => nil,
         'to'       => [],
+        'cc'       => [],
+        'bcc'      => [],
         'subject'  => nil,
         'body'     => nil,
         'encoding' => 'UTF-7'
       }.merge( opt )
+      arrayize_dests
       @conf['port']     = default_send_port if ( !@conf['port'] )
       @conf['encoding'] = @conf['encoding'].upcase
       @nkf_out          = nkf_out
     end
     attr_reader :name
+
+    def destinations
+      return %w( to cc bcc )
+    end
+
+    def arrayize_dests
+      destinations.each { |e|
+        @conf[e] = @conf[e].is_a?( String ) ? [@conf[e]] : @conf[e]
+      }
+    end
 
     def default_send_port
       # non-auth smtp
@@ -46,7 +59,6 @@ module PukiAssist
     def sendmail
       if ( pop_before_smtp? )
         apop = ( @conf['auth']['type'] == 'apop' )
-        p apop
         Net::POP3.APOP( apop ).auth_only( @conf['pop'],
                                           nil,
                                           @conf['auth']['user'],
@@ -61,7 +73,7 @@ module PukiAssist
                        'localhost.localdomain',
                        @conf['auth']['user'], @conf['auth']['pass'],
                        authtype ) { |s|
-        s.sendmail( header + body, @conf['from'], @conf['to'] )
+        s.sendmail( header + body, @conf['from'], cat_dests )
       }
     end
 
@@ -70,27 +82,49 @@ module PukiAssist
 
       case ( @conf['body'].class.to_s )
       when 'String'
-        body = erbed( @conf['body'] )
+        body = erb_apply( @conf['body'] )
       when 'Symbol'
-        body = erbed( open( File.join( PATH[:recipe], "#{@name}.erb" ) ).read )
+        body = erb_apply( open( File.join( PATH[:recipe], "#{@name}.erb" ) ).read )
       end
 
       return Iconv.conv( @conf['encoding'], 'UTF-8', body )
     end
 
     def subject
-      return erbed( @conf['subject'] )
+      return erb_apply( @conf['subject'] )
     end
 
     def header
-      return <<EOD
-From: #{header_encode( @conf['from'] )}
-Subject: #{header_encode( subject )}
+      return erb_apply( <<EOD )
+From: <%= header_encode( @conf['from'] ) %>
+Subject: <%= header_encode( subject ) %>
+<%- %w( to cc ).each { |e| if ( @conf[e].size > 0 ) -%>
+<%= spread_destination( e ) %>
+<%- end } -%>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=#{@conf['encoding']}
-Content-Transfer-Encoding: #{transfer_encoding}
+Content-Type: text/plain; charset=<%= @conf['encoding'] %>
+Content-Transfer-Encoding: <%= transfer_encoding %>
 
 EOD
+    end
+
+    def spread_destination( dest )
+      return "#{dest.capitalize}: #{@conf[dest].join( ',' )}"
+    end
+
+    def cat_dests
+      dests = []
+
+      %w( to cc bcc ).each { |e|
+        case @conf[e].class.to_s
+        when 'Array'
+          dests += @conf[e]
+        when 'String'
+          dests << @conf[e]
+        end
+      }
+
+      return dests
     end
 
     #
@@ -109,8 +143,8 @@ EOD
       return NKF.nkf( "-M#{@nkf_out}", content )
     end
 
-    def erbed( str )
-      return ERB.new( str ).result
+    def erb_apply( str )
+      return ERB.new( str, nil, '-' ).result( binding )
     end
 
     def pop_before_smtp?
