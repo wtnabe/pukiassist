@@ -12,6 +12,7 @@ LICENCE : two-clause BSD
 
 =end
 
+gem 'mechanize', '< 0.9'
 require 'www/mechanize'
 require 'hpricot'
 

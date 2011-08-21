@@ -17,6 +17,7 @@ PukiWiki を使ったお仕事を少しだけ楽にするツールです。完�
 ====================
 
  * Ruby
+ * Bundler
  * Rake
  * WWW::Mechanize
  * Hpricot
@@ -28,9 +29,8 @@ PukiWiki を使ったお仕事を少しだけ楽にするツールです。完�
 ruby と必要な gem をインストール
 --------------------------------
 
-$ gem install rake
-$ gem install mechanize
-$ gem install hpricot
+$ gem install bundler
+$ bundle install --path vendor
 
 現在の Mechanize 0.9 以降のデフォルトパーサは Nokogiri なんですが、
 UTF-8 じゃないページを扱おうとすると苦労が多そうなのであえて Hpricot を
@@ -39,7 +39,7 @@ UTF-8 じゃないページを扱おうとすると苦労が多そうなので�
 とりあえず動くかどうか確認
 --------------------------
 
-$ rake
+$ bundle exec rake
 
 rake clean  # cleanup each namespace's backup and debugging pages
 

@@ -51,7 +51,5 @@ task :clean do
 end
 
 task :default do
-  app = Rake.application
-  app.options.show_task_pattern = Regexp.new('')
-  app.display_tasks_and_comments
+  sh 'bundle exec rake -s -T', :verbose => false
 end
