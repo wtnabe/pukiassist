@@ -2,4 +2,4 @@
 source 'http://rubygems.org'
 
 gem 'rake'
-gem 'mechanize', '< 0.9'
+gem 'mechanize', '< 2'

@@ -12,20 +12,17 @@ LICENCE : two-clause BSD
 
 =end
 
-gem 'mechanize', '< 0.9'
-require 'www/mechanize'
-require 'hpricot'
+gem 'mechanize', '< 2'
+require 'mechanize'
 
-WWW::Mechanize.html_parser = Hpricot
-
-class EzDebug_Mechanize < WWW::Mechanize
+class EzDebug_Mechanize < Mechanize
   def initialize( params = {} )
     super()
 
-    @debug     = nil
-    @page_dir  = nil
+    @debug    = nil
+    @page_dir = nil
 
-    opt = { 
+    opt = {
       :debug    => false,
       :page_dir => nil
     }.merge( params )
@@ -38,8 +35,8 @@ class EzDebug_Mechanize < WWW::Mechanize
 
   def fetch_page( params )
     page = super
-    
-    if ( @debug and page.is_a?( WWW::Mechanize::File ) and @page_dir )
+
+    if ( @debug and page.is_a?( Mechanize::File ) and @page_dir )
       pagepath = Object::File.join( @page_dir,
                                     sprintf( "%03i_%s",
                                              @history.size, page.filename ) )

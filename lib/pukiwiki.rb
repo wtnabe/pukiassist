@@ -68,7 +68,7 @@ module PukiAssist
       msg  = form.field_with( :name => 'msg' )
       msg.value = 'created by pukiassist' if msg.value == ''
 
-      form.submit( form.button_with( :value => 'ページの更新'.send( "to#{@conf['charset']}" ) ) )
+      form.submit( form.button_with( :value => 'ページの更新' ) )
     end
 
     def find_msg_form( page )
@@ -115,6 +115,8 @@ module PukiAssist
     #
     # HTML としてパースできる場合はエラーが表示されているので例外
     #
+    # [return] String
+    #
     def fetch
       uri = create_uri
       s   = uri.read
@@ -126,11 +128,23 @@ module PukiAssist
     end
 
     #
-    # HTML として解釈できるかどうか
+    # HTML かどうか
+    #
+    # [param]  String  str
+    # [return] Boolean
     #
     def html?( str )
-      d = Hpricot( str )
-      return d.inspect.include?( 'elem' )
+      ret = false
+
+      if ( str.respond_to?( :meta ) )
+        meta = str.meta
+        if ( meta.has_key?( 'content-type' ) and
+             meta['content-type'].include?( 'text/html' ) )
+          ret = true
+        end
+      end
+
+      return ret
     end
 
     def store
