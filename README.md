@@ -20,7 +20,7 @@ PukiWiki を使ったお仕事を少しだけ楽にするツールです。完�
  * Rubygems
  * Bundler
  * Rake
- * WWW::Mechanize
+ * Mechanize
  * ちょっとした YAML の知識
 
 どうやって使うの？
@@ -29,13 +29,13 @@ PukiWiki を使ったお仕事を少しだけ楽にするツールです。完�
 ruby と必要な gem をインストール
 --------------------------------
 
-$ gem install bundler
-$ bundle install --path vendor
+    $ gem install bundler
+    $ bundle install --path vendor
 
 とりあえず動くかどうか確認
 --------------------------
 
-$ bundle exec rake
+    $ bundle exec rake
 
 rake clean  # cleanup each namespace's backup and debugging pages
 
@@ -59,23 +59,23 @@ recipes/ ディレクトリの中に YAML で設定ファイルを置いてく�
 practice.yaml です。とりあえず中身は空でよいです。そしてまた rake を呼
 びます。すると以下のように怒られます。
 
-rake aborted!
-PukiAssist::PukiWiki::ConfigForPukiwikiNotExist
+    rake aborted!
+    PukiAssist::PukiWiki::ConfigForPukiwikiNotExist
 
 今度は practice.yaml の中身を以下のようにしてください。
 
-pukiwiki:
-  uri_host: 'http://pukiwiki.example.com'
-  uri_base: '/PATH/TO/PUKIWIKI/'
-  paganame_prefix: 'Log/'
+    pukiwiki:
+      uri_host: 'http://pukiwiki.example.com'
+      uri_base: '/PATH/TO/PUKIWIKI/'
+      paganame_prefix: 'Log/'
 
 三度目の rake. 今度は以下のように表示されるはずです。
 
-rake clean                 # cleanup each namespace's backup and debugging ...
-rake practice:clean        # cleanup backup files and mechanize debugging p...
-rake practice:create_page  # create new page on
-rake practice:fetch        # fetch PukiWiki raw data to 20090517-raw.txt
-rake practice:setextize    # covert PukiWiki to setext on 20090517-setext.txt
+    rake clean                 # cleanup each namespace's backup and debugging ...
+    rake practice:clean        # cleanup backup files and mechanize debugging p...
+    rake practice:create_page  # create new page on
+    rake practice:fetch        # fetch PukiWiki raw data to 20090517-raw.txt
+    rake practice:setextize    # covert PukiWiki to setext on 20090517-setext.txt
 
 ご覧のように作った YAML ファイルの分だけ namespace ができ、その中にいく
 つか task が現れます。
@@ -102,8 +102,8 @@ page/ ディレクトリ
 このディレクトリには Mechanize 関係の情報が保存されます。通常は使いませ
 ん。
 
- pukiwiki:
-   debug: true
+    pukiwiki:
+      debug: true
 
 と設定すると Mechanize の取得した HTML、それをパースした結果が保存され
 ます。
@@ -128,30 +128,30 @@ pagename_prefix と date
 
 例えば
 
-pukiwiki:
-  date: 2009-05-23
-  pagename_prefix: Log
+    pukiwiki:
+      date: 2009-05-23
+      pagename_prefix: Log
 
 の場合は Log2009-05-23 というページを、
 
-pukiwiki:
-  date: 2009-05-23
-  pagename_prefix: Log/
+    pukiwiki:
+      date: 2009-05-23
+      pagename_prefix: Log/
 
 の場合は Log/2009-05-23 というページを扱います。
 
 しかしまったく日付と関係のないページを扱うこともできます。その場合は
 
-pukiwiki:
-  date: ''   # ( or null )
-  pagename_prefix: 完全なページ名
+    pukiwiki:
+      date: ''   # ( or null )
+      pagename_prefix: 完全なページ名
 
 と、明示的に date: を空文字か null（nil は文字列 "nil" になってしまう）
 にしてあげると、日付の関係ないページを扱うことができます。この場合
 setext 用の設定も
 
-setext:
-  filename_suffix: 完全なファイル名
+    setext:
+      filename_suffix: 完全なファイル名
 
 と、補完されない日付の分も含めて完全なファイル名を指定してください。
 
@@ -163,19 +163,19 @@ erb の使えるところ
 
 以下の部分で erb が使えます。
 
-mail:
-  subject:
-  body:
-copy:
-  path:
+    mail:
+      subject:
+      body:
+    copy:
+      path:
 
 使いどころ
 ==========
 
  * PukiWiki を使ってドキュメントを書いているが、訳あってメールを使って
    その情報を共有したい
-   -> setext 形式に変換できるので Wiki に書いた内容をほぼそのままメール
-      で送ってもあまり違和感がありません。
+   * -> setext 形式に変換できるので Wiki に書いた内容をほぼそのままメー
+        ルで送ってもあまり違和感がありません。
  * PukiWiki 上に定期的に情報を集約したいので calendar2 形式のページをサ
    クッと作成してその URL をメールで配信したい
 
