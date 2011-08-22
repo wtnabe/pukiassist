@@ -44,7 +44,7 @@ module PukiAssist
     def write
       if ( raw_path_available? and path )
         File.open( path, 'wb' ) { |f|
-          f.puts( (PukiWiki2Setext.new.convert( File.open( raw_path ).read ).join( "\r\n" ) + "\r\n").tosjis )
+          f.puts( (PukiWiki2Setext.new.convert( File.open( raw_path ).read.toutf8 ).join( "\r\n" ) + "\r\n").tosjis )
         }
       end
     end

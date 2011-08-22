@@ -1,7 +1,7 @@
 # -*- mode: ruby; coding: utf-8 -*-
 
 require File.dirname( __FILE__ ) + '/lib/lib'
-$KCODE = 'u'
+$KCODE = 'u' unless defined? ::Encoding
 
 Dir.chdir( File.dirname( __FILE__ ) )
 
