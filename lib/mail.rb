@@ -73,21 +73,27 @@ module PukiAssist
                        'localhost.localdomain',
                        @conf['auth']['user'], @conf['auth']['pass'],
                        authtype ) { |s|
-        s.sendmail( header + body, @conf['from'], cat_dests )
+        message = header + body
+        message = message.force_encoding('binary') if defined? ::Encoding
+        s.sendmail( message, @conf['from'], cat_dests )
       }
     end
 
     def body
       body = ''
 
-      case ( @conf['body'].class.to_s )
-      when 'String'
+      case @conf['body']
+      when String
         body = erb_apply( @conf['body'] )
-      when 'Symbol'
+      when Symbol
         body = erb_apply( open( File.join( PATH[:recipe], "#{@name}.erb" ) ).read )
       end
 
-      return Iconv.conv( @conf['encoding'], 'UTF-8', body )
+      if defined? ::Encoding
+        body.encode( @conf['encoding'] )
+      else
+        Iconv.conv( @conf['encoding'], 'UTF-8', body )
+      end
     end
 
     def subject
@@ -95,7 +101,7 @@ module PukiAssist
     end
 
     def header
-      return erb_apply( <<EOD )
+      h = erb_apply( <<EOD )
 From: <%= header_encode( @conf['from'] ) %>
 Subject: <%= header_encode( subject ) %>
 <%- %w( to cc ).each { |e| if ( @conf[e].size > 0 ) -%>
@@ -106,6 +112,12 @@ Content-Type: text/plain; charset=<%= @conf['encoding'] %>
 Content-Transfer-Encoding: <%= transfer_encoding %>
 
 EOD
+
+      if defined? ::Encoding
+        h.encode( @conf['encoding'] )
+      else
+        h
+      end
     end
 
     def spread_destination( dest )
@@ -116,10 +128,10 @@ EOD
       dests = []
 
       %w( to cc bcc ).each { |e|
-        case @conf[e].class.to_s
-        when 'Array'
+        case @conf[e]
+        when Array
           dests += @conf[e]
-        when 'String'
+        when String
           dests << @conf[e]
         end
       }
